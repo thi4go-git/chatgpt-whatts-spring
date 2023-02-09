@@ -1,5 +1,7 @@
 package net.ddns.cloudtecnologia.chat.client;
 
+import net.ddns.cloudtecnologia.chat.dto.ChoicesDTO;
+import net.ddns.cloudtecnologia.chat.dto.ResponseDTO;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -17,7 +19,6 @@ public class Chrome {
     WebDriver chrome;
     String USER_PATCH;
 
-    ChatGpt chat = new ChatGpt();
 
     private static final String URL_LOGIN = "https://web.whatsapp.com/";
 
@@ -103,12 +104,19 @@ public class Chrome {
         }
     }
 
+
     public void enviarMensagem(String mensagem) {
+        ChatGpt chat = new ChatGpt();
+        ResponseDTO resposta = chat.resposta(mensagem);
+        StringBuffer respostaMsg = new StringBuffer();
+        for (ChoicesDTO c : resposta.getChoices()) {
+            respostaMsg.append(c.getText());
+        }
         String caixaMsgTag = "//*[@id=\"main\"]/footer/div[1]/div/span[2]/div/div[2]/div[1]/div/div[1]/p";
         WebElement caixaMsg = chrome.findElement(By.xpath(caixaMsgTag));
         caixaMsg.click();
         aguardar(2);
-        caixaMsg.sendKeys(chat.responderMsg(mensagem));
+        caixaMsg.sendKeys("(AUTO): " + respostaMsg.toString());
         aguardar(10);
         chrome.findElement(By.xpath("//*[@id=\"main\"]/footer/div[1]/div/span[2]/div/div[2]/div[2]/button")).click();
     }
